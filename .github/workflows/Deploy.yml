@@ -4,19 +4,19 @@ on:
   push:
     branches: [main, master]
   schedule:
-    - cron: '0 3 * * *'  # 每天凌晨3点
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # 允许 git push
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 确保完整历史，便于后续push
+          fetch-depth: 0
 
       - name: Clean large log files
         run: |
@@ -28,16 +28,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 只添加日志文件（避免意外提交其他修改）
-          git add "*.log" "**/*.log"
-          
-          # 如果有变更则提交并推送
-          if git diff --cached --quiet; then
-            echo "✅ No log changes to commit"
-          else
+          # 检查是否有日志文件变更，有则添加并提交
+          if git status --porcelain | grep -q "\.log$"; then
+            git add "*.log" "**/*.log"
             git commit -m "🧹 Auto-clean logs [skip ci]"
             git push
             echo "✅ Log files cleaned and pushed"
+          else
+            echo "✅ No log files to commit"
           fi
 
       - name: Setup Node
