@@ -4,19 +4,19 @@ on:
   push:
     branches: [main, master]
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '0 3 * * *'  # 每天凌晨3点
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # 允许 git push
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # 确保完整历史，便于后续push
 
       - name: Clean large log files
         run: |
@@ -41,7 +41,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'  # 从 '20' 更新为 '22'
 
       - name: Install Wrangler
         run: npm install -g wrangler@4.103.0
